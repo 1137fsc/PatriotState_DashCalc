@@ -99,18 +99,7 @@ This facility was optimized to operate **right of BEP** to minimize total power 
 
 ---
 
-## Deployment
 
-This calculator is deployed via GitHub Pages. To deploy your own:
-
-1. Fork this repository
-2. Go to **Settings** → **Pages**
-3. Under "Source", select **Deploy from a branch**
-4. Select **main** branch and **/ (root)** folder
-5. Click **Save**
-6. Access at `https://<username>.github.io/PatriotState_DashCalc/`
-
----
 
 ## Technical Notes
 
@@ -119,14 +108,6 @@ This calculator is deployed via GitHub Pages. To deploy your own:
 - Works offline once loaded
 - Mobile-responsive design
 
----
 
-## Contact
-
-**Edge Controls, LLC**  
-PO Box 9939  
-Midland, TX 79708
-
----
 
 *Patriot State SWD #1 — Commissioned January 2026*
