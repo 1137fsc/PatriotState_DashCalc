@@ -1,1 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wire-to-Water Efficiency Calculator | Edge Controls</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e14;
+            --bg-secondary: #141a23;
+            --bg-tertiary: #1a222d;
+            --bg-panel: #0d1117;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #484f58;
+            --accent-green: #3fb950;
+            --accent-green-dim: rgba(63, 185, 80, 0.15);
+            --accent-amber: #d29922;
+            --accent-amber-dim: rgba(210, 153, 34, 0.15);
+            --accent-red: #f85149;
+            --accent-red-dim: rgba(248, 81, 73, 0.15);
+            --accent-blue: #58a6ff;
+            --accent-cyan: #39c5cf;
+            --border-color: #30363d;
+            --border-bright: #484f58;
+            --gradient-green: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+            --gradient-amber: linear-gradient(135deg, #9e6a03 0%, #d29922 100%);
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-green);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .logo-text span {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .header-badge {
+            background: var(--accent-green-dim);
+            color: var(--accent-green);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid rgba(63, 185, 80, 0.3);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Page Title */
+        .page-title {
+            margin-bottom: 2rem;
+        }
+
+        .page-title h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-title h2::before {
+            content: '';
+            width: 4px;
+            height: 28px;
+            background: var(--accent-green);
+            border-radius: 2px;
+        }
+
+        .page-title p {
+            color: var(--text-secondary);
+            margin-left: 1rem;
+        }
+
+        /* Grid Layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 400px;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1400px) {
+            .main-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panel Styles */
+        .panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: var(--bg-tertiary);
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-header h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-header .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .panel-body {
+            padding: 1.25rem;
+        }
+
+        /* Form Inputs */
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-group label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .input-group label .unit {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: var(--bg-panel);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px var(--accent-green-dim);
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Input Row */
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Section Divider */
+        .section-divider {
+            margin: 1.5rem 0;
+            padding: 0.75rem 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            background: var(--bg-panel);
+            margin-left: -1.25rem;
+            margin-right: -1.25rem;
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+        }
+
+        /* Results Display */
+        .results-panel {
+            grid-column: span 1;
+        }
+
+        @media (max-width: 1400px) {
+            .results-panel {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .results-panel {
+                grid-column: span 1;
+            }
+        }
+
+        .result-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .result-card.primary::before {
+            background: var(--accent-green);
+        }
+
+        .result-card.secondary::before {
+            background: var(--accent-cyan);
+        }
+
+        .result-card.warning::before {
+            background: var(--accent-amber);
+        }
+
+        .result-card.danger::before {
+            background: var(--accent-red);
+        }
+
+        .result-card .label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-card .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .result-card.primary .value {
+            color: var(--accent-green);
+        }
+
+        .result-card.secondary .value {
+            color: var(--accent-cyan);
+        }
+
+        .result-card.warning .value {
+            color: var(--accent-amber);
+        }
+
+        .result-card.danger .value {
+            color: var(--accent-red);
+        }
+
+        .result-card .subtext {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Efficiency Gauge */
+        .gauge-container {
+            text-align: center;
+            padding: 2rem 1rem;
+            background: var(--bg-panel);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .gauge {
+            position: relative;
+            width: 200px;
+            height: 100px;
+            margin: 0 auto 1rem;
+            overflow: hidden;
+        }
+
+        .gauge-bg {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 180deg,
+                var(--accent-red) 0deg,
+                var(--accent-amber) 60deg,
+                var(--accent-green) 120deg,
+                var(--accent-green) 180deg
+            );
+            clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+        }
+
+        .gauge-inner {
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            background: var(--bg-panel);
+            border-radius: 50%;
+            top: 20px;
+            left: 20px;
+        }
+
+        .gauge-needle {
+            position: absolute;
+            width: 4px;
+            height: 70px;
+            background: linear-gradient(to top, var(--text-primary) 0%, transparent 100%);
+            left: 50%;
+            bottom: 0;
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(-90deg);
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 2px;
+        }
+
+        .gauge-center {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: var(--text-primary);
+            border-radius: 50%;
+            left: 50%;
+            bottom: -8px;
+            transform: translateX(-50%);
+        }
+
+        .gauge-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .gauge-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Efficiency Bars */
+        .efficiency-breakdown {
+            margin-top: 1.5rem;
+        }
+
+        .eff-bar-item {
+            margin-bottom: 1rem;
+        }
+
+        .eff-bar-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .eff-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.35rem;
+            font-size: 0.8rem;
+        }
+
+        .eff-bar-label span:first-child {
+            color: var(--text-secondary);
+        }
+
+        .eff-bar-label span:last-child {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+        }
+
+        .eff-bar {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .eff-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .eff-bar-fill.green { background: var(--accent-green); }
+        .eff-bar-fill.cyan { background: var(--accent-cyan); }
+        .eff-bar-fill.amber { background: var(--accent-amber); }
+
+        /* Formula Display */
+        .formula-box {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .formula-box .formula-title {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .formula-box code {
+            color: var(--accent-cyan);
+        }
+
+        /* Cost Summary */
+        .cost-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .cost-item {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .cost-item .cost-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .cost-item .cost-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge.optimal {
+            background: var(--accent-green-dim);
+            color: var(--accent-green);
+            border: 1px solid rgba(63, 185, 80, 0.3);
+        }
+
+        .status-badge.warning {
+            background: var(--accent-amber-dim);
+            color: var(--accent-amber);
+            border: 1px solid rgba(210, 153, 34, 0.3);
+        }
+
+        .status-badge.critical {
+            background: var(--accent-red-dim);
+            color: var(--accent-red);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Button */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--gradient-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(63, 185, 80, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-panel);
+            border-color: var(--border-bright);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table th {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+        }
+
+        .comparison-table td {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .comparison-table .highlight {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .comparison-table .savings {
+            color: var(--accent-amber);
+        }
+
+        /* Info Tooltip */
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 50%;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            cursor: help;
+            margin-left: 0.35rem;
+        }
+
+        /* Panel full width */
+        .panel-full {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">EC</div>
+            <div class="logo-text">
+                <h1>Edge Controls</h1>
+                <span>Pump Efficiency Calculator</span>
+            </div>
+        </div>
+        <div class="header-badge">v2.0 | Wire-to-Water</div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="page-title">
+            <h2>Injection Pump Efficiency Analysis</h2>
+            <p>Calculate true wire-to-water efficiency using actual VFD measurements. Optimize operating point to minimize power consumption.</p>
+        </div>
+
+        <div class="main-grid">
+            <!-- Pump Curve Parameters Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3><span class="indicator"></span> Pump Curve Parameters</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>
+                                Discharge Nominal
+                                <span class="unit">PSI</span>
+                            </label>
+                            <input type="number" id="dischargeNominal" value="2200" step="10" oninput="calculate()">
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                Flow Nominal
+                                <span class="unit">BPD</span>
+                            </label>
+                            <input type="number" id="flowNominal" value="15000" step="100" oninput="calculate()">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>
+                                BEP Efficiency
+                                <span class="unit">%</span>
+                            </label>
+                            <input type="number" id="effBEP" value="77.1" step="0.1" oninput="calculate()">
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                BEP Flow
+                                <span class="unit">BPD</span>
+                            </label>
+                            <input type="number" id="flowBEP" value="12000" step="100" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <div class="section-divider">System Specifications</div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>
+                                Max Speed
+                                <span class="unit">Hz</span>
+                            </label>
+                            <input type="number" id="speedMax" value="60" step="1" oninput="calculate()">
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                Specific Gravity
+                                <span class="unit">SG</span>
+                            </label>
+                            <input type="number" id="specificGravity" value="1.02" step="0.01" oninput="calculate()">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>
+                                Motor Efficiency
+                                <span class="unit">%</span>
+                            </label>
+                            <input type="number" id="motorEff" value="95.8" step="0.1" oninput="calculate()">
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                VFD Efficiency
+                                <span class="unit">%</span>
+                            </label>
+                            <input type="number" id="vfdEff" value="96.0" step="0.1" oninput="calculate()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operating Data Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3><span class="indicator"></span> Operating Data (From VFD/Field)</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>
+                                VFD Frequency
+                                <span class="unit">Hz</span>
+                            </label>
+                            <input type="number" id="vfdFreq" value="48" step="0.1" oninput="calculate()">
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                Actual Flow
+                                <span class="unit">BPD</span>
+                            </label>
+                            <input type="number" id="flowActual" value="11500" step="100" oninput="calculate()">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>
+                                Discharge Pressure
+                                <span class="unit">PSI</span>
+                            </label>
+                            <input type="number" id="pressureDisch" value="1800" step="10" oninput="calculate()">
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                Suction Pressure
+                                <span class="unit">PSI</span>
+                            </label>
+                            <input type="number" id="pressureSuct" value="45" step="1" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <div class="section-divider">Electrical Measurements</div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>
+                                Motor Voltage (L-L)
+                                <span class="unit">V</span>
+                            </label>
+                            <input type="number" id="vfdVoltage" value="384" step="1" oninput="calculate()">
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                Motor Current
+                                <span class="unit">A</span>
+                            </label>
+                            <input type="number" id="vfdCurrent" value="420" step="1" oninput="calculate()">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>
+                            Power Factor
+                            <span class="unit">PF</span>
+                        </label>
+                        <input type="number" id="powerFactor" value="0.85" step="0.01" min="0" max="1" oninput="calculate()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="panel results-panel">
+                <div class="panel-header">
+                    <h3><span class="indicator"></span> Efficiency Results</h3>
+                    <span class="status-badge optimal" id="statusBadge">
+                        <span class="status-dot"></span>
+                        <span id="statusText">Optimal</span>
+                    </span>
+                </div>
+                <div class="panel-body">
+                    <!-- Main Gauge -->
+                    <div class="gauge-container">
+                        <div class="gauge">
+                            <div class="gauge-bg"></div>
+                            <div class="gauge-inner"></div>
+                            <div class="gauge-needle" id="gaugeNeedle"></div>
+                            <div class="gauge-center"></div>
+                        </div>
+                        <div class="gauge-value" id="mainEfficiency">0.0%</div>
+                        <div class="gauge-label">Wire-to-Water Efficiency</div>
+                    </div>
+
+                    <!-- Result Cards -->
+                    <div class="result-card primary">
+                        <div class="label">Electrical Power Input</div>
+                        <div class="value" id="powerInputKW">0.0 kW</div>
+                        <div class="subtext" id="powerInputHP">0.0 HP</div>
+                    </div>
+
+                    <div class="result-card secondary">
+                        <div class="label">Hydraulic Power Output</div>
+                        <div class="value" id="powerOutputHP">0.0 HP</div>
+                        <div class="subtext" id="powerOutputKW">0.0 kW</div>
+                    </div>
+
+                    <div class="result-card warning">
+                        <div class="label">Power Losses</div>
+                        <div class="value" id="powerLoss">0.0 HP</div>
+                        <div class="subtext">Converted to heat</div>
+                    </div>
+
+                    <!-- Efficiency Breakdown -->
+                    <div class="efficiency-breakdown">
+                        <div class="eff-bar-item">
+                            <div class="eff-bar-label">
+                                <span>VFD Efficiency</span>
+                                <span id="vfdEffDisplay">96.0%</span>
+                            </div>
+                            <div class="eff-bar">
+                                <div class="eff-bar-fill cyan" id="vfdEffBar" style="width: 96%"></div>
+                            </div>
+                        </div>
+                        <div class="eff-bar-item">
+                            <div class="eff-bar-label">
+                                <span>Motor Efficiency</span>
+                                <span id="motorEffDisplay">95.8%</span>
+                            </div>
+                            <div class="eff-bar">
+                                <div class="eff-bar-fill green" id="motorEffBar" style="width: 95.8%"></div>
+                            </div>
+                        </div>
+                        <div class="eff-bar-item">
+                            <div class="eff-bar-label">
+                                <span>Pump Efficiency (Calculated)</span>
+                                <span id="pumpEffDisplay">0.0%</span>
+                            </div>
+                            <div class="eff-bar">
+                                <div class="eff-bar-fill amber" id="pumpEffBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cost Analysis Panel -->
+            <div class="panel panel-full">
+                <div class="panel-header">
+                    <h3><span class="indicator"></span> Cost Analysis</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="input-row" style="max-width: 600px;">
+                        <div class="input-group">
+                            <label>
+                                Electricity Rate
+                                <span class="unit">$/kWh</span>
+                            </label>
+                            <input type="number" id="kwhRate" value="0.10" step="0.01" oninput="calculate()">
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                Operating Hours
+                                <span class="unit">hrs/year</span>
+                            </label>
+                            <input type="number" id="operatingHours" value="8000" step="100" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <div class="cost-grid" style="margin-top: 1.5rem;">
+                        <div class="cost-item">
+                            <div class="cost-label">Cost per Hour</div>
+                            <div class="cost-value" id="costPerHour">$0.00</div>
+                        </div>
+                        <div class="cost-item">
+                            <div class="cost-label">Cost per Day</div>
+                            <div class="cost-value" id="costPerDay">$0.00</div>
+                        </div>
+                        <div class="cost-item">
+                            <div class="cost-label">Annual Cost</div>
+                            <div class="cost-value" id="costAnnual">$0.00</div>
+                        </div>
+                    </div>
+
+                    <!-- BEP Comparison -->
+                    <div class="section-divider">Comparison vs BEP Operation</div>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>At BEP (60 Hz)</th>
+                                <th>Current Operation</th>
+                                <th>Difference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Frequency</td>
+                                <td>60.0 Hz</td>
+                                <td id="cmpFreq">48.0 Hz</td>
+                                <td id="cmpFreqDiff" class="savings">-12.0 Hz</td>
+                            </tr>
+                            <tr>
+                                <td>Est. Power (cube law)</td>
+                                <td id="cmpBepPower">700.8 HP</td>
+                                <td id="cmpCurrentPower">0.0 HP</td>
+                                <td id="cmpPowerDiff" class="highlight">0.0 HP</td>
+                            </tr>
+                            <tr>
+                                <td>Est. Annual Cost</td>
+                                <td id="cmpBepCost">$0</td>
+                                <td id="cmpCurrentCost">$0</td>
+                                <td id="cmpCostDiff" class="highlight">$0 saved</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Formula Reference Panel -->
+            <div class="panel panel-full">
+                <div class="panel-header">
+                    <h3>Formula Reference</h3>
+                </div>
+                <div class="panel-body" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                    <div class="formula-box">
+                        <div class="formula-title">Electrical Power Input</div>
+                        <code>P<sub>in</sub> = √3 × V × I × PF / 1000</code>
+                        <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;">
+                            Where V = line voltage, I = current, PF = power factor
+                        </p>
+                    </div>
+                    <div class="formula-box">
+                        <div class="formula-title">Hydraulic Power Output</div>
+                        <code>HP<sub>hyd</sub> = (Q × H × SG) / 3960</code>
+                        <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;">
+                            Where Q = GPM, H = head (ft), SG = specific gravity
+                        </p>
+                    </div>
+                    <div class="formula-box">
+                        <div class="formula-title">Wire-to-Water Efficiency</div>
+                        <code>η<sub>W2W</sub> = HP<sub>hyd</sub> / HP<sub>elec</sub> × 100%</code>
+                        <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;">
+                            Captures VFD, motor, and pump losses
+                        </p>
+                    </div>
+                    <div class="formula-box">
+                        <div class="formula-title">Affinity Law - Power</div>
+                        <code>P<sub>2</sub> = P<sub>1</sub> × (N<sub>2</sub>/N<sub>1</sub>)³</code>
+                        <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;">
+                            Power scales with speed CUBED
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>
+            <strong>Edge Controls, LLC</strong> | PO Box 9939, Midland, TX 79708<br>
+            Patriot State SWD #1 – Blackbuck Resources | Calculator v2.0<br>
+            <a href="https://github.com/edge-controls" target="_blank">github.com/edge-controls</a>
+        </p>
+    </footer>
+
+    <script>
+        // Constants
+        const SQRT3 = Math.sqrt(3);
+        const KW_TO_HP = 1.341;
+        const BPD_TO_GPM = 34.286;
+        const PSI_TO_FT_FACTOR = 2.31;
+        const HYDRAULIC_CONSTANT = 3960;
+
+        function calculate() {
+            // Get inputs - Pump Curve
+            const dischargeNominal = parseFloat(document.getElementById('dischargeNominal').value) || 0;
+            const flowNominal = parseFloat(document.getElementById('flowNominal').value) || 0;
+            const effBEP = parseFloat(document.getElementById('effBEP').value) || 77.1;
+            const flowBEP = parseFloat(document.getElementById('flowBEP').value) || 12000;
+            const speedMax = parseFloat(document.getElementById('speedMax').value) || 60;
+            const specificGravity = parseFloat(document.getElementById('specificGravity').value) || 1.02;
+            const motorEff = parseFloat(document.getElementById('motorEff').value) || 95.8;
+            const vfdEff = parseFloat(document.getElementById('vfdEff').value) || 96.0;
+
+            // Get inputs - Operating Data
+            const vfdFreq = parseFloat(document.getElementById('vfdFreq').value) || 0;
+            const flowActual = parseFloat(document.getElementById('flowActual').value) || 0;
+            const pressureDisch = parseFloat(document.getElementById('pressureDisch').value) || 0;
+            const pressureSuct = parseFloat(document.getElementById('pressureSuct').value) || 0;
+            const vfdVoltage = parseFloat(document.getElementById('vfdVoltage').value) || 0;
+            const vfdCurrent = parseFloat(document.getElementById('vfdCurrent').value) || 0;
+            const powerFactor = parseFloat(document.getElementById('powerFactor').value) || 0.85;
+
+            // Get inputs - Cost
+            const kwhRate = parseFloat(document.getElementById('kwhRate').value) || 0;
+            const operatingHours = parseFloat(document.getElementById('operatingHours').value) || 8000;
+
+            // === CALCULATIONS ===
+
+            // Electrical Power Input
+            const powerInKW = (SQRT3 * vfdVoltage * vfdCurrent * powerFactor) / 1000;
+            const powerInHP = powerInKW * KW_TO_HP;
+
+            // Differential Pressure
+            const differentialPSI = Math.max(0, pressureDisch - pressureSuct);
+
+            // Convert flow to GPM
+            const flowGPM = flowActual / BPD_TO_GPM;
+
+            // Convert PSI to feet of head
+            const headFt = (differentialPSI * PSI_TO_FT_FACTOR) / specificGravity;
+
+            // Hydraulic Power Output
+            const hydraulicHP = (flowGPM * headFt * specificGravity) / HYDRAULIC_CONSTANT;
+            const hydraulicKW = hydraulicHP / KW_TO_HP;
+
+            // Wire-to-Water Efficiency
+            let effW2W = 0;
+            if (powerInHP > 0) {
+                effW2W = (hydraulicHP / powerInHP) * 100;
+                effW2W = Math.min(100, Math.max(0, effW2W));
+            }
+
+            // Back-calculate pump efficiency
+            const driveTrainEff = (vfdEff * motorEff) / 10000;
+            let pumpEff = 0;
+            if (driveTrainEff > 0.5) {
+                pumpEff = effW2W / driveTrainEff;
+                pumpEff = Math.min(100, Math.max(0, pumpEff));
+            }
+
+            // Power losses
+            const powerLoss = Math.max(0, powerInHP - hydraulicHP);
+
+            // Cost calculations
+            const costPerHour = powerInKW * kwhRate;
+            const costPerDay = costPerHour * 24;
+            const costAnnual = costPerHour * operatingHours;
+
+            // BEP comparison (estimate power at BEP using cube law)
+            const speedRatio = vfdFreq / speedMax;
+            const bepHP = 700.8; // From pump curve spec
+            const bepPowerAtSpeed = bepHP * Math.pow(speedRatio, 3);
+            const bepKW = bepPowerAtSpeed / KW_TO_HP;
+            const bepAnnualCost = bepKW * kwhRate * operatingHours;
+            
+            // Full speed BEP cost
+            const fullSpeedBepKW = bepHP / KW_TO_HP;
+            const fullSpeedBepAnnual = fullSpeedBepKW * kwhRate * operatingHours;
+
+            // === UPDATE UI ===
+
+            // Main efficiency gauge
+            document.getElementById('mainEfficiency').textContent = effW2W.toFixed(1) + '%';
+            
+            // Gauge needle rotation (-90deg = 0%, 90deg = 100%)
+            const needleAngle = -90 + (effW2W * 1.8);
+            document.getElementById('gaugeNeedle').style.transform = 
+                `translateX(-50%) rotate(${needleAngle}deg)`;
+
+            // Power cards
+            document.getElementById('powerInputKW').textContent = powerInKW.toFixed(1) + ' kW';
+            document.getElementById('powerInputHP').textContent = powerInHP.toFixed(1) + ' HP';
+            document.getElementById('powerOutputHP').textContent = hydraulicHP.toFixed(1) + ' HP';
+            document.getElementById('powerOutputKW').textContent = hydraulicKW.toFixed(1) + ' kW';
+            document.getElementById('powerLoss').textContent = powerLoss.toFixed(1) + ' HP';
+
+            // Efficiency bars
+            document.getElementById('vfdEffDisplay').textContent = vfdEff.toFixed(1) + '%';
+            document.getElementById('vfdEffBar').style.width = vfdEff + '%';
+            document.getElementById('motorEffDisplay').textContent = motorEff.toFixed(1) + '%';
+            document.getElementById('motorEffBar').style.width = motorEff + '%';
+            document.getElementById('pumpEffDisplay').textContent = pumpEff.toFixed(1) + '%';
+            document.getElementById('pumpEffBar').style.width = pumpEff + '%';
+
+            // Cost display
+            document.getElementById('costPerHour').textContent = '$' + costPerHour.toFixed(2);
+            document.getElementById('costPerDay').textContent = '$' + costPerDay.toFixed(2);
+            document.getElementById('costAnnual').textContent = '$' + costAnnual.toLocaleString('en-US', {maximumFractionDigits: 0});
+
+            // Comparison table
+            document.getElementById('cmpFreq').textContent = vfdFreq.toFixed(1) + ' Hz';
+            document.getElementById('cmpFreqDiff').textContent = (vfdFreq - speedMax).toFixed(1) + ' Hz';
+            document.getElementById('cmpBepPower').textContent = bepHP.toFixed(1) + ' HP';
+            document.getElementById('cmpCurrentPower').textContent = powerInHP.toFixed(1) + ' HP';
+            
+            const powerDiff = bepHP - powerInHP;
+            document.getElementById('cmpPowerDiff').textContent = 
+                (powerDiff >= 0 ? '-' : '+') + Math.abs(powerDiff).toFixed(1) + ' HP';
+            document.getElementById('cmpPowerDiff').className = powerDiff >= 0 ? 'highlight' : 'savings';
+
+            document.getElementById('cmpBepCost').textContent = '$' + fullSpeedBepAnnual.toLocaleString('en-US', {maximumFractionDigits: 0});
+            document.getElementById('cmpCurrentCost').textContent = '$' + costAnnual.toLocaleString('en-US', {maximumFractionDigits: 0});
+            
+            const costSavings = fullSpeedBepAnnual - costAnnual;
+            document.getElementById('cmpCostDiff').textContent = 
+                '$' + Math.abs(costSavings).toLocaleString('en-US', {maximumFractionDigits: 0}) + 
+                (costSavings >= 0 ? ' saved' : ' extra');
+            document.getElementById('cmpCostDiff').className = costSavings >= 0 ? 'highlight' : 'savings';
+
+            // Status badge
+            const badge = document.getElementById('statusBadge');
+            const statusText = document.getElementById('statusText');
+            
+            if (effW2W >= 65) {
+                badge.className = 'status-badge optimal';
+                statusText.textContent = 'Optimal';
+            } else if (effW2W >= 50) {
+                badge.className = 'status-badge warning';
+                statusText.textContent = 'Acceptable';
+            } else {
+                badge.className = 'status-badge critical';
+                statusText.textContent = 'Low Efficiency';
+            }
+        }
+
+        // Initial calculation on page load
+        document.addEventListener('DOMContentLoaded', calculate);
+    </script>
+</body>
+</html>
